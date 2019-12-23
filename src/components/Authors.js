@@ -1,10 +1,26 @@
 import React, { useState } from 'react'
-import { useApolloClient, useQuery } from 'react-apollo'
+import { useApolloClient, useQuery, useMutation } from 'react-apollo'
 import { gql } from 'apollo-boost'
 
+const Authors = ({ show, result, editAuthor }) => {
 
+  const [author, setAuthor] = useState('')
+  const [year, setYear] = useState('')
 
-const Authors = ({ show, result}) => {
+  const submit = async (e) => {
+    e.preventDefault()
+
+    // Call the mutation function
+    await editAuthor({
+      variables: {
+        author,
+        year
+      }
+    })
+
+    setAuthor('')
+    setYear('')
+  }
 
   if (!show) {
     return null
@@ -38,6 +54,27 @@ const Authors = ({ show, result}) => {
         </tbody>
       </table>
 
+      <h3>Set birthyear</h3>
+      <form onSubmit={submit}>
+        <div>
+          Author
+          <select onChange={({ target }) => setAuthor(target.value)}>
+            {result.data.allAuthors.map(a => 
+              <option key={a.id} value={a.name} >{a.name}</option>
+
+              )}
+          </select>
+        </div>
+        <div>
+          born
+            <input
+            value={year}
+            onChange={({ target }) => setYear(parseInt(target.value))}
+          />
+        </div>
+        <button type='submit'>create book</button>
+
+      </form>
     </div>
   )
 }

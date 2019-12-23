@@ -10,6 +10,7 @@ import { useMutation } from 'react-apollo'
 const ALL_AUTHORS = gql`
 {
   allAuthors {
+    id
     name
     born
     bookCount
@@ -43,6 +44,15 @@ const CREATE_BOOK = gql`
   }
 `
 
+const EDIT_BIRTHYEAR = gql`
+mutation editBirthYear($author: String!, $year: Int!) {
+    editAuthor(name: $author, setBornTo: $year ) {
+        name
+        born
+      }
+}
+`
+
 const App = () => {
 
   /* GraphQL Hooks */
@@ -56,6 +66,10 @@ const App = () => {
 
   const [addBook] = useMutation(CREATE_BOOK, {
     refetchQueries: [{ query:  ALL_AUTHORS }, { query: ALL_BOOKS }],
+  })
+
+  const [editAuthor] = useMutation(EDIT_BIRTHYEAR, {
+    refetchQueries: [{ query: ALL_AUTHORS }]
   })
 
   return (
@@ -74,6 +88,7 @@ const App = () => {
       <Authors
         show={page === 'authors'}
         result={authors}
+        editAuthor={editAuthor}
       />
 
       <Books
