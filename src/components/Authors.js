@@ -2,26 +2,15 @@ import React, { useState } from 'react'
 import { useApolloClient, useQuery } from 'react-apollo'
 import { gql } from 'apollo-boost'
 
-const ALL_AUTHORS = gql`
-{
-  allAuthors {
-    name
-    born
-    bookCount
-  }
-}
-`
 
-const Authors = (props) => {
 
-  /* GraphQL Hooks */
-  const authors = useQuery(ALL_AUTHORS)
+const Authors = ({ show, result}) => {
 
-  if (!props.show) {
+  if (!show) {
     return null
   }
 
-  if (authors.loading) {
+  if (result.loading) {
     return "Loading..."
   }
 
@@ -39,7 +28,7 @@ const Authors = (props) => {
               books
             </th>
           </tr>
-          {authors.data.allAuthors.map(a =>
+          {result.data.allAuthors.map(a =>
             <tr key={a.name}>
               <td>{a.name}</td>
               <td>{a.born}</td>

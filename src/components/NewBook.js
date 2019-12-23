@@ -14,7 +14,15 @@ const NewBook = (props) => {
   const submit = async (e) => {
     e.preventDefault()
 
-    console.log('add book...')
+    // Call the mutation function
+    await props.addBook({
+      variables: {
+        title,
+        published,
+        author,
+        genres
+      }
+    })
 
     setTitle('')
     setPublished('')
@@ -50,7 +58,7 @@ const NewBook = (props) => {
           <input
             type='number'
             value={published}
-            onChange={({ target }) => setPublished(target.value)}
+            onChange={({ target }) => setPublished(parseInt(target.value))}
           />
         </div>
         <div>
