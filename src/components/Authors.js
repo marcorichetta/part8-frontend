@@ -1,10 +1,16 @@
 import React, { useState } from 'react'
+import { useApolloClient } from 'react-apollo'
+
 
 const Authors = (props) => {
+
   if (!props.show) {
     return null
   }
-  const authors = []
+
+  if (props.result.loading) {
+    return "Loading..."
+  }
 
   return (
     <div>
@@ -20,7 +26,7 @@ const Authors = (props) => {
               books
             </th>
           </tr>
-          {authors.map(a =>
+          {props.result.data.allAuthors.map(a =>
             <tr key={a.name}>
               <td>{a.name}</td>
               <td>{a.born}</td>
