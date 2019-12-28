@@ -26,6 +26,10 @@ const Authors = ({ show, result, editAuthor }) => {
     return null
   }
 
+  if (result.data === undefined) {
+    return "Authors cannot be gathered from backend"
+  }
+
   if (result.loading) {
     return "Loading..."
   }
@@ -72,7 +76,7 @@ const Authors = ({ show, result, editAuthor }) => {
             onChange={({ target }) => setYear(parseInt(target.value))}
           />
         </div>
-        <button type='submit'>create book</button>
+        <button type='submit'>Save change</button>
 
       </form>
     </div>

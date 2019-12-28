@@ -22,8 +22,10 @@ const ALL_BOOKS = gql`
 {
   allBooks {
     title
-    author
     published
+    author {
+      name
+    }
   }
 }
 `
@@ -39,7 +41,9 @@ const CREATE_BOOK = gql`
     ) {
       title
       published
-      author
+      author {
+        name
+      }
     }
   }
 `
