@@ -19,7 +19,7 @@ const LoginForm = (props) => {
             const token = result.data.login.value
             props.setToken(token)
             props.setPage('authors')
-            localStorage.setItem('phonenumbers-user-token', token)
+            localStorage.setItem('library-user-token', token)
         }
 
         setUsername('')

@@ -1,6 +1,4 @@
 import React, { useState } from 'react'
-import { useApolloClient, useQuery, useMutation } from 'react-apollo'
-import { gql } from 'apollo-boost'
 
 const Authors = ({ show, result, editAuthor }) => {
 
