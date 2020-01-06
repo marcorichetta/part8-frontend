@@ -1,12 +1,37 @@
 import React, { useState } from 'react'
+import { gql } from 'apollo-boost'
+import { useApolloClient } from 'react-apollo'
 
+const BOOKS_BY_GENRE = gql`
+  query booksByGenre($genreToSearch: String!) {
+    allBooks(genre: $genreToSearch) {
+      title
+      published
+      author {
+        name
+      }
+    }
+  }
+`
 
 const Books = ({ show, result }) => {
 
-  const [filter, setFilter] = useState('ALL')
+  const client = useApolloClient(BOOKS_BY_GENRE)
 
-  const handleFilter = (event) => {
-    setFilter(event.target.textContent)
+  /* State hooks */
+  const [books, setBooks] = useState(null)
+  const [currentGenre, setCurrentGenre] = useState(null)
+
+  // It sends a parameterized query with the clicked genre
+  // and sets books with the result obtained
+  const showBooks = async (genre) => {
+    const { data } = await client.query({
+      query: BOOKS_BY_GENRE,
+      variables: { genreToSearch: genre }
+    })
+
+    setBooks(data.allBooks)
+    setCurrentGenre(genre)
   }
 
   if (!show) {
@@ -21,44 +46,53 @@ const Books = ({ show, result }) => {
     return "Loading..."
   }
 
+  // Rendered when there is a filter
+  if (books) {
+    return (
+      <div>
+      <h2>Filtered by genre: {currentGenre}</h2>
+        <table>
+          <tbody>
+            <tr>
+              <th>Title</th>
+              <th>
+                Author
+            </th>
+              <th>
+                Published
+            </th>
+            </tr>
+        {books.map(b => 
+          <tr key={b.title}>
+            <td>{b.title}</td>
+            <td>{b.author.name}</td>
+            <td>{b.published}</td>
+          </tr> 
+          )}
+        </tbody>
+      </table>
+      <button onClick={() => setBooks(null)}>Remove filter</button>
+      </div>
+    )
+  }
+
   // Get all genres and flat to a single array
   const allGenres = result.data.allBooks.map(b => b.genres).flat()
 
   // Remove duplicates
   const uniqueGenres = [...new Set(allGenres)]
 
-  let booksByGenre = result.data.allBooks
-
-  if (filter !== 'ALL') {
-    booksByGenre = result.data.allBooks.filter(b => b.genres.includes(filter))
-  }
-  
-  //Return an array with the books which contain the genre (filter)
-
   return (
     <div>
-      <h2>books</h2>
-
-      {filter === 'ALL' 
-      ? <h4>No filter</h4>
-      : <>
-          <h4>Filtered by {filter}</h4>
-          <button onClick={() => setFilter('ALL')}>Remove filter</button>
-        </>
-      }
+      <h2>All books</h2>
       <table>
         <tbody>
           <tr>
-            <th></th>
-            <th>
-              author
-            </th>
-            <th>
-              published
-            </th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Published</th>
           </tr>
-          {result.data && 
-            booksByGenre.map(a =>
+          {result.data.allBooks.map(a =>
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
@@ -70,9 +104,9 @@ const Books = ({ show, result }) => {
 
       {/* Filter */}
       {uniqueGenres.map(g => 
-        <button 
+        <button
           key={g}
-          onClick={handleFilter}>{g}</button>)
+          onClick={() => showBooks(g)}>{g}</button>)
       }
     </div>
   )

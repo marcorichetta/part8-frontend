@@ -7,8 +7,6 @@ const Reccommendation = ({ show, result }) => {
         return null
     }
 
-    console.log('asd', result)
-    // Only checking books (Also should include the other query)
     if (result.books.data === undefined || result.user.data === undefined) {
         return "No reccommendation or not logged in"
     }

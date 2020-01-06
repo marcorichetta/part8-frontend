@@ -21,32 +21,32 @@ const BOOK_DETAILS = gql`
 `
 
 const ALL_AUTHORS = gql`
-{
-  allAuthors {
-    id
-    name
-    born
-    bookCount
+  query {
+    allAuthors {
+      id
+      name
+      born
+      bookCount
+    }
   }
-}
 `
 
 const ALL_BOOKS = gql`
-{
-  allBooks {
-    ...BookDetails
+  query {
+    allBooks {
+      ...BookDetails
+    }
   }
-}
 ${BOOK_DETAILS}
 `
 
 const USER_INFO = gql`
-{
-  me {
-    username
-    favoriteGenre
+  query {
+    me {
+      username
+      favoriteGenre
+    }
   }
-}
 `
 
 const BOOK_ADDED = gql`
@@ -143,10 +143,10 @@ const App = () => {
       updateCacheWith(newBook)
     }
   })
-  
+
   /* GraphQL Mutations Hooks */
   const [addBook] = useMutation(CREATE_BOOK, {
-    refetchQueries: [{ query:  ALL_AUTHORS }, { query: ALL_BOOKS }],
+    refetchQueries: [{ query: ALL_AUTHORS }, { query: ALL_BOOKS }],
     update: (store, response) => {
       updateCacheWith(response.data.addBook)
     }
@@ -174,7 +174,7 @@ const App = () => {
     <div style={{ color: 'red' }}>
       {errorMessage}
     </div>
-  
+
   return (
 
     <div>
@@ -185,7 +185,7 @@ const App = () => {
 
 
         {/* Conditional rendering based on existence of token */}
-        {token 
+        {token
           ? (
             <>
               <button onClick={() => setPage('reccommendations')}>reccommendations</button>
