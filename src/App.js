@@ -3,6 +3,7 @@ import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
+import Reccommendation from './components/Reccommendation'
 
 import { gql } from 'apollo-boost'
 import { useQuery, useApolloClient } from 'react-apollo'
@@ -28,6 +29,15 @@ const ALL_BOOKS = gql`
     author {
       name
     }
+  }
+}
+`
+
+const USER_INFO = gql`
+{
+  me {
+    username
+    favoriteGenre
   }
 }
 `
@@ -75,6 +85,7 @@ const App = () => {
   /* GraphQL Hooks */
   const authors = useQuery(ALL_AUTHORS)
   const books = useQuery(ALL_BOOKS)
+  const userInfo = useQuery(USER_INFO)
 
   /* State Hooks */
   const [page, setPage] = useState('authors')
@@ -99,13 +110,16 @@ const App = () => {
   })
 
   const [login] = useMutation(LOGIN, {
-    onError: handleError
+    onError: handleError,
+    refetchQueries: [{ query: USER_INFO }]
   })
 
   const logout = () => {
     setToken(null)
     localStorage.clear()
     client.resetStore()
+
+    setPage('authors')
   }
 
   const errorNotification = () => errorMessage &&
@@ -126,6 +140,7 @@ const App = () => {
         {token 
           ? (
             <>
+              <button onClick={() => setPage('reccommendations')}>reccommendations</button>
               <button onClick={() => setPage('add')}>add book</button>
               <button onClick={logout}>logout</button>
             </>
@@ -145,6 +160,14 @@ const App = () => {
       <Books
         show={page === 'books'}
         result={books}
+      />
+
+      <Reccommendation
+        show={page === 'reccommendations'}
+        result={{
+          "user": userInfo,
+          "books": books
+        }}
       />
 
       <NewBook

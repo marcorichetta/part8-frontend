@@ -24,7 +24,7 @@ const Authors = ({ show, result, editAuthor }) => {
     return null
   }
 
-  if (result.data === undefined) {
+  if (!result.data) {
     return "Authors cannot be gathered from backend"
   }
 

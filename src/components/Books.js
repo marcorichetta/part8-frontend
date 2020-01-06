@@ -3,7 +3,6 @@ import React, { useState } from 'react'
 
 const Books = ({ show, result }) => {
 
-  const [booksToShow, setBooksToShow] = useState('')
   const [filter, setFilter] = useState('ALL')
 
   const handleFilter = (event) => {
