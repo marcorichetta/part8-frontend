@@ -115,9 +115,41 @@ const App = () => {
     }, 10000)
   }
 
+  // Mantain the Apollo cache in sync with the subscriptions
+  const updateCacheWith = (addedBook) => {
+    const includedIn = (set, object) =>
+      set.map(p => p.id).includes(object.id)
+
+    const dataInStore = client.readQuery({ query: ALL_BOOKS })
+    if (!includedIn(dataInStore.allBooks, addedBook)) {
+      dataInStore.allBooks.push(addedBook)
+      client.writeQuery({
+        query: ALL_BOOKS,
+        data: dataInStore
+      })
+    }
+  }
+
+  // Subscribe to added books
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+
+      let newBook = subscriptionData.data.bookAdded
+
+      // Show notification
+      window.alert(`New book added: ${newBook.title} by ${newBook.author.name}`)
+
+      // Update Apollo cache
+      updateCacheWith(newBook)
+    }
+  })
+  
   /* GraphQL Mutations Hooks */
   const [addBook] = useMutation(CREATE_BOOK, {
     refetchQueries: [{ query:  ALL_AUTHORS }, { query: ALL_BOOKS }],
+    update: (store, response) => {
+      updateCacheWith(response.data.addBook)
+    }
   })
 
   const [editAuthor] = useMutation(EDIT_BIRTHYEAR, {
@@ -129,16 +161,6 @@ const App = () => {
     refetchQueries: [{ query: USER_INFO }]
   })
 
-  // Subscribe to added books
-  useSubscription(BOOK_ADDED, {
-    onSubscriptionData: ({ subscriptionData }) => {
-
-      let bookTitle = subscriptionData.data.bookAdded.title
-      let bookAuthor = subscriptionData.data.bookAdded.author.name
-
-      window.alert(`New book added: ${bookTitle} by ${bookAuthor}`)
-    }
-  })
 
   const logout = () => {
     setToken(null)
