@@ -6,8 +6,19 @@ import LoginForm from './components/LoginForm'
 import Reccommendation from './components/Reccommendation'
 
 import { gql } from 'apollo-boost'
-import { useQuery, useApolloClient } from 'react-apollo'
-import { useMutation } from 'react-apollo'
+import { useQuery, useMutation, useSubscription, useApolloClient } from 'react-apollo'
+
+// Fragment used on ALL_BOOKS and BOOK_ADDED
+const BOOK_DETAILS = gql`
+  fragment BookDetails on Book {
+    title
+    published
+    genres
+    author {
+      name
+    }
+  }
+`
 
 const ALL_AUTHORS = gql`
 {
@@ -23,14 +34,10 @@ const ALL_AUTHORS = gql`
 const ALL_BOOKS = gql`
 {
   allBooks {
-    title
-    published
-    genres
-    author {
-      name
-    }
+    ...BookDetails
   }
 }
+${BOOK_DETAILS}
 `
 
 const USER_INFO = gql`
@@ -42,6 +49,14 @@ const USER_INFO = gql`
 }
 `
 
+const BOOK_ADDED = gql`
+  subscription {
+    bookAdded {
+      ...BookDetails
+    }
+  }
+${BOOK_DETAILS}
+`
 
 const CREATE_BOOK = gql`
   mutation createBook($title: String!, $published: Int!, $author: String, $genres: [String]) {
@@ -61,7 +76,7 @@ const CREATE_BOOK = gql`
 `
 
 const EDIT_BIRTHYEAR = gql`
-mutation editBirthYear($author: String!, $year: Int!) {
+  mutation editBirthYear($author: String!, $year: Int!) {
     editAuthor(name: $author, setBornTo: $year ) {
         name
         born
@@ -112,6 +127,17 @@ const App = () => {
   const [login] = useMutation(LOGIN, {
     onError: handleError,
     refetchQueries: [{ query: USER_INFO }]
+  })
+
+  // Subscribe to added books
+  useSubscription(BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+
+      let bookTitle = subscriptionData.data.bookAdded.title
+      let bookAuthor = subscriptionData.data.bookAdded.author.name
+
+      window.alert(`New book added: ${bookTitle} by ${bookAuthor}`)
+    }
   })
 
   const logout = () => {
