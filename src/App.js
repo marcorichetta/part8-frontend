@@ -1,96 +1,25 @@
 import React, { useState } from 'react'
+import { useQuery, useMutation, useSubscription, useApolloClient } from 'react-apollo'
+
+/* Components */
 import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
 import Reccommendation from './components/Reccommendation'
 
-import { gql } from 'apollo-boost'
-import { useQuery, useMutation, useSubscription, useApolloClient } from 'react-apollo'
+/* Queries */
+import { ALL_AUTHORS } from "./graphql/queries/author";
+import { ALL_BOOKS } from "./graphql/queries/book";
+import { USER_INFO } from "./graphql/queries/user";
 
-// Fragment used on ALL_BOOKS and BOOK_ADDED
-const BOOK_DETAILS = gql`
-  fragment BookDetails on Book {
-    title
-    published
-    genres
-    author {
-      name
-    }
-  }
-`
+/* Mutations */
+import { EDIT_BIRTHYEAR } from "./graphql/mutations/author";
+import { CREATE_BOOK } from "./graphql/mutations/book";
+import { LOGIN } from "./graphql/mutations/user";
 
-const ALL_AUTHORS = gql`
-  query {
-    allAuthors {
-      id
-      name
-      born
-      bookCount
-    }
-  }
-`
-
-const ALL_BOOKS = gql`
-  query {
-    allBooks {
-      ...BookDetails
-    }
-  }
-${BOOK_DETAILS}
-`
-
-const USER_INFO = gql`
-  query {
-    me {
-      username
-      favoriteGenre
-    }
-  }
-`
-
-const BOOK_ADDED = gql`
-  subscription {
-    bookAdded {
-      ...BookDetails
-    }
-  }
-${BOOK_DETAILS}
-`
-
-const CREATE_BOOK = gql`
-  mutation createBook($title: String!, $published: Int!, $author: String, $genres: [String]) {
-    addBook(
-      title: $title,
-      published: $published,
-      author: $author,
-      genres: $genres
-    ) {
-      title
-      published
-      author {
-        name
-      }
-    }
-  }
-`
-
-const EDIT_BIRTHYEAR = gql`
-  mutation editBirthYear($author: String!, $year: Int!) {
-    editAuthor(name: $author, setBornTo: $year ) {
-        name
-        born
-      }
-}
-`
-
-const LOGIN = gql`
-  mutation login($username: String!, $password: String!) {
-    login(username: $username, password: $password)  {
-      value
-    }
-  }
-`
+/* Subscriptions */
+import { BOOK_ADDED } from "./graphql/subscriptions/book";
 
 const App = () => {
 
