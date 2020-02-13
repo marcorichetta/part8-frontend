@@ -14,13 +14,13 @@ import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
 
 const wslink = new WebSocketLink({
-    uri: 'ws://localhost:4000/graphql',
-    options: { reconnect: true }
-})
+	uri: "ws://part8-graphql-backend.herokuapp.com/",
+	options: { reconnect: true }
+});
 
 const httpLink = createHttpLink({
-    uri: 'http://localhost:4000/graphql',    
-})
+	uri: "https://part8-graphql-backend.herokuapp.com/"
+});
 
 const authLink = setContext((_, { headers }) => {
     const token = localStorage.getItem('library-user-token')
